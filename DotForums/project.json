@@ -32,7 +32,8 @@
     "Microsoft.AspNetCore.Authentication.Cookies": "1.1.0",
     "System.Private.DataContractSerialization": "4.3.0",
     "System.Runtime.Serialization.Json": "4.3.0",
-    "System.Collections.Specialized": "4.3.0"
+    "System.Collections.Specialized": "4.3.0",
+    "System.Data.SqlClient": "4.1.0"
   },
 
   "tools": {

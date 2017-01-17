@@ -17,16 +17,16 @@ namespace DotForums.Controllers
             _context = Forum.Manager.GetContext();
         }
 
-        // GET: api/Users
+        // GET api/User{?optional index/size}
         [HttpGet]
-        public async Task<IActionResult> Get()
-        {
-            // return Ok(await _context.Users.ToListAsync());
-            var Test = await _context.Users.GetAllAsync();
-            return Ok(Test);
+        public async Task<IActionResult> Get([FromQuery]int index, [FromQuery]int size)
+        {    
+            if (index < 1 || size < 1)
+                return Ok(await _context.Users.GetAsync());
+            return Ok(await _context.Users.GetAsync(null, index, size));
         }
 
-        // GET api/values/5
+        // GET api/User/{ID}
         [HttpGet("{ID}")]
         public async Task<IActionResult> Get(ulong ID)
         {
@@ -36,31 +36,36 @@ namespace DotForums.Controllers
             return NotFound(new ForumError() { Code = ForumError.ErrorCodes.USER_NOTFOUND });
         }
 
-        // POST api/values
+        // POST api/User
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody]Dictionary<string, string> User)
+        public async Task<IActionResult> Post([FromBody]Dictionary<string, string> Body)
         {
-            /*var newUser = new UserModel { Name = User["username"], Email = User["email"], Username = User["username"]};
-            await _context.Users.AddAsync(newUser);
-            if (await _context.SaveChangesAsync() > 0)
-                return Ok(await _context.Users.FirstOrDefaultAsync(u => u.Username == User["username"]));
-            return Ok(new ForumError()
-            {
-                Code = ForumError.ErrorCodes.USER_NOTFOUND
-            });*/
-             throw new NotImplementedException();
+            Body["ip"] = HttpContext.Connection.RemoteIpAddress.ToString();
+            var User = await _context.Users.CreateAsync(Body);
+            if (User != null)
+                return Created(User.ID.ToString(), User);
+
+            return StatusCode(409);
         }
 
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
+        // PUT api/User/{ID}
+        [HttpPut("{ID}")]
+        public async Task<IActionResult> Put(ulong ID, [FromBody]Dictionary<string, object> Body)
         {
+            var User = await _context.Users.UpdateAsync(ID, Body);
+            if (User != null)
+                return Ok(User);
+            return NotFound(new ForumError() { Code = ForumError.ErrorCodes.USER_NOTFOUND });
         }
 
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        // DELETE api/User/{ID}
+        [HttpDelete("{ID}")]
+        public async Task<IActionResult> Delete(ulong ID)
         {
+            var User = await _context.Users.DeleteAsync(ID);
+            if (User != null)
+                return Ok(User);
+            return NotFound(new ForumError() { Code = ForumError.ErrorCodes.USER_NOTFOUND });
         }
 
         #region GET_USER_INFORMATION

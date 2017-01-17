@@ -15,18 +15,6 @@ namespace DotForums.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.1.0-rtm-22752");
 
-            modelBuilder.Entity("DotForums.Models.AvatarModel", b =>
-                {
-                    b.Property<ulong>("ID")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("Name");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("AvatarModel");
-                });
-
             modelBuilder.Entity("DotForums.Models.CategoryModel", b =>
                 {
                     b.Property<ulong>("ID")
@@ -69,9 +57,18 @@ namespace DotForums.Migrations
                     b.Property<ulong>("ID")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<int>("Members");
+
                     b.Property<string>("Name");
 
+                    b.Property<string>("Title")
+                        .IsRequired();
+
+                    b.Property<ulong?>("UserModelID");
+
                     b.HasKey("ID");
+
+                    b.HasIndex("UserModelID");
 
                     b.ToTable("Groups");
                 });
@@ -118,13 +115,14 @@ namespace DotForums.Migrations
                         .ValueGeneratedOnAdd()
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
+                    b.Property<string>("Discriminator")
+                        .IsRequired();
+
                     b.Property<DateTime>("Modified")
                         .ValueGeneratedOnAddOrUpdate()
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("Name");
-
-                    b.Property<ulong?>("ParentID");
 
                     b.Property<string>("Slug");
 
@@ -137,17 +135,15 @@ namespace DotForums.Migrations
 
                     b.HasIndex("CategoryModelID");
 
-                    b.HasIndex("ParentID");
-
                     b.ToTable("Threads");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("ThreadModel");
                 });
 
             modelBuilder.Entity("DotForums.Models.UserModel", b =>
                 {
                     b.Property<ulong>("ID")
                         .ValueGeneratedOnAdd();
-
-                    b.Property<ulong?>("AvatarID");
 
                     b.Property<DateTime>("Date")
                         .ValueGeneratedOnAdd()
@@ -156,26 +152,37 @@ namespace DotForums.Migrations
                     b.Property<string>("Email")
                         .IsRequired();
 
-                    b.Property<ulong>("GroupID");
-
                     b.Property<string>("Name");
 
-                    b.Property<int>("Posts");
+                    b.Property<DateTime>("Seen")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasAnnotation("Sqlite:DefaultValueSql", "CURRENT_TIMESTAMP");
 
                     b.Property<string>("Username")
                         .IsRequired();
 
-                    b.Property<DateTime>("lastLogin");
-
                     b.HasKey("ID");
 
-                    b.HasAlternateKey("Username", "Email");
-
-                    b.HasIndex("AvatarID");
-
-                    b.HasIndex("GroupID");
+                    b.HasIndex("Username", "Email");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("DotForums.Models.PostModel", b =>
+                {
+                    b.HasBaseType("DotForums.Models.ThreadModel");
+
+                    b.Property<ulong?>("ParentID");
+
+                    b.Property<ulong?>("UserModelID");
+
+                    b.HasIndex("ParentID");
+
+                    b.HasIndex("UserModelID");
+
+                    b.ToTable("PostModel");
+
+                    b.HasDiscriminator().HasValue("PostModel");
                 });
 
             modelBuilder.Entity("DotForums.Models.CategoryModel", b =>
@@ -189,6 +196,13 @@ namespace DotForums.Migrations
                 {
                     b.HasOne("DotForums.Models.UserModel")
                         .WithMany("Events")
+                        .HasForeignKey("UserModelID");
+                });
+
+            modelBuilder.Entity("DotForums.Models.GroupModel", b =>
+                {
+                    b.HasOne("DotForums.Models.UserModel")
+                        .WithMany("Groups")
                         .HasForeignKey("UserModelID");
                 });
 
@@ -210,29 +224,25 @@ namespace DotForums.Migrations
             modelBuilder.Entity("DotForums.Models.ThreadModel", b =>
                 {
                     b.HasOne("DotForums.Models.UserModel", "Author")
-                        .WithMany()
+                        .WithMany("Threads")
                         .HasForeignKey("AuthorID")
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.HasOne("DotForums.Models.CategoryModel")
                         .WithMany("Threads")
                         .HasForeignKey("CategoryModelID");
-
-                    b.HasOne("DotForums.Models.ThreadModel", "Parent")
-                        .WithMany("Posts")
-                        .HasForeignKey("ParentID");
                 });
 
-            modelBuilder.Entity("DotForums.Models.UserModel", b =>
+            modelBuilder.Entity("DotForums.Models.PostModel", b =>
                 {
-                    b.HasOne("DotForums.Models.AvatarModel", "Avatar")
-                        .WithMany()
-                        .HasForeignKey("AvatarID");
-
-                    b.HasOne("DotForums.Models.GroupModel", "Group")
-                        .WithMany()
-                        .HasForeignKey("GroupID")
+                    b.HasOne("DotForums.Models.ThreadModel", "Parent")
+                        .WithMany("Posts")
+                        .HasForeignKey("ParentID")
                         .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("DotForums.Models.UserModel")
+                        .WithMany("Posts")
+                        .HasForeignKey("UserModelID");
                 });
         }
     }

@@ -71,7 +71,12 @@ namespace DotForums
                 {
                     var Administrators = new Models.GroupModel
                     {
-                        Name = "Administrators"
+                        Title = "Administrators",
+                    };
+
+                    var Users = new Models.GroupModel
+                    {
+                        Title = "Users"
                     };
 
                     var General = new Models.CategoryModel
@@ -92,7 +97,7 @@ namespace DotForums
                         Name = "User",
                         Username = "Administrator",
                         Email = "admin@dotforums.org",
-                        Group = Administrators
+                        Groups = new List<Models.GroupModel> { Administrators }
                     };
 
                     var Thread = new Models.ThreadModel
@@ -103,13 +108,12 @@ namespace DotForums
                         Author = Administrator,
                     };
 
-                    var Reply = new Models.ThreadModel
+                    var Reply = new Models.PostModel
                     {
                         Name = "Reply",
                         Title = "Reply Title",
                         Content = "Reply Content",
                         Author = Administrator,
-                        Parent = Thread
                     };
 
                     Thread.Permissions.Add(new Models.PermissionModel
@@ -119,24 +123,26 @@ namespace DotForums
                         Permission = Models.PermissionModel.ALL_PERMISSIONS
                     });
 
+                    Context.Users.Add(Administrator);
+                    Context.Posts.Add(Reply);
                     Thread.Posts.Add(Reply);
+                    Administrator.Threads.Add(Thread);
                     General.Threads.Add(Thread);
                     Context.Categories.Add(General);
                     Context.Groups.Add(Administrators);
-                    Context.Users.Add(Administrator);
+                    Context.Groups.Add(Users);
                     Context.SaveChanges();
-
 
                     #region PERFORMANCE_TESTING
                     Models.UserModel User = null;
-                    for (int i = 0; i < 0; i++)
+                    for (int i = 0; i < 100; i++)
                     {
                         User = new Models.UserModel
                         {
                             Name = "User",
-                            Username = "Administrator" + i,
-                            Email = "admin@dotforums.org" + i,
-                            Group = Administrators
+                            Username = "TestUser" + i,
+                            Email = "user@dotforums.org" + i,
+                            Groups = new List<Models.GroupModel> { Users }
                         };
                         Context.Users.Add(User);
                     }

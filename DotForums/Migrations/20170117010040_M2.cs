@@ -4,23 +4,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace DotForums.Migrations
 {
-    public partial class Migratory : Migration
+    public partial class M2 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "AvatarModel",
-                columns: table => new
-                {
-                    ID = table.Column<ulong>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Name = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AvatarModel", x => x.ID);
-                });
-
             migrationBuilder.CreateTable(
                 name: "Categories",
                 columns: table => new
@@ -44,49 +31,20 @@ namespace DotForums.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Groups",
-                columns: table => new
-                {
-                    ID = table.Column<ulong>(nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Name = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Groups", x => x.ID);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
                     ID = table.Column<ulong>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    AvatarID = table.Column<ulong>(nullable: true),
                     Date = table.Column<DateTime>(nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
                     Email = table.Column<string>(nullable: false),
-                    GroupID = table.Column<ulong>(nullable: false),
                     Name = table.Column<string>(nullable: true),
-                    Posts = table.Column<int>(nullable: false),
-                    Username = table.Column<string>(nullable: false),
-                    lastLogin = table.Column<DateTime>(nullable: false)
+                    Seen = table.Column<DateTime>(nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    Username = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.ID);
-                    table.UniqueConstraint("AK_Users_Username_Email", x => new { x.Username, x.Email });
-                    table.ForeignKey(
-                        name: "FK_Users_AvatarModel_AvatarID",
-                        column: x => x.AvatarID,
-                        principalTable: "AvatarModel",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Users_Groups_GroupID",
-                        column: x => x.GroupID,
-                        principalTable: "Groups",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -110,6 +68,28 @@ namespace DotForums.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Groups",
+                columns: table => new
+                {
+                    ID = table.Column<ulong>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Members = table.Column<int>(nullable: false),
+                    Name = table.Column<string>(nullable: true),
+                    Title = table.Column<string>(nullable: false),
+                    UserModelID = table.Column<ulong>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Groups", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_Groups_Users_UserModelID",
+                        column: x => x.UserModelID,
+                        principalTable: "Users",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Threads",
                 columns: table => new
                 {
@@ -119,11 +99,13 @@ namespace DotForums.Migrations
                     CategoryModelID = table.Column<ulong>(nullable: true),
                     Content = table.Column<string>(nullable: false),
                     Date = table.Column<DateTime>(nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    Discriminator = table.Column<string>(nullable: false),
                     Modified = table.Column<DateTime>(nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
                     Name = table.Column<string>(nullable: true),
-                    ParentID = table.Column<ulong>(nullable: true),
                     Slug = table.Column<string>(nullable: true),
-                    Title = table.Column<string>(nullable: false)
+                    Title = table.Column<string>(nullable: false),
+                    ParentID = table.Column<ulong>(nullable: true),
+                    UserModelID = table.Column<ulong>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -144,6 +126,12 @@ namespace DotForums.Migrations
                         name: "FK_Threads_Threads_ParentID",
                         column: x => x.ParentID,
                         principalTable: "Threads",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Threads_Users_UserModelID",
+                        column: x => x.UserModelID,
+                        principalTable: "Users",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -194,6 +182,11 @@ namespace DotForums.Migrations
                 column: "UserModelID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Groups_UserModelID",
+                table: "Groups",
+                column: "UserModelID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PermissionModel_CategoryModelID",
                 table: "PermissionModel",
                 column: "CategoryModelID");
@@ -224,14 +217,14 @@ namespace DotForums.Migrations
                 column: "ParentID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Users_AvatarID",
-                table: "Users",
-                column: "AvatarID");
+                name: "IX_Threads_UserModelID",
+                table: "Threads",
+                column: "UserModelID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Users_GroupID",
+                name: "IX_Users_Username_Email",
                 table: "Users",
-                column: "GroupID");
+                columns: new[] { "Username", "Email" });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -243,6 +236,9 @@ namespace DotForums.Migrations
                 name: "PermissionModel");
 
             migrationBuilder.DropTable(
+                name: "Groups");
+
+            migrationBuilder.DropTable(
                 name: "Threads");
 
             migrationBuilder.DropTable(
@@ -250,12 +246,6 @@ namespace DotForums.Migrations
 
             migrationBuilder.DropTable(
                 name: "Categories");
-
-            migrationBuilder.DropTable(
-                name: "AvatarModel");
-
-            migrationBuilder.DropTable(
-                name: "Groups");
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DotForums.Models
 {
@@ -14,6 +15,8 @@ namespace DotForums.Models
         public List<UserGroupModel> Groups { get; set; }
         public DateTime Seen { get; set; }
         public DateTime Date { get; set; } 
+        public ulong ProfileID { get; set; }
+        [ForeignKey("ProfileID")]
         public UserInformationModel Profile { get; set; }
         public List<ThreadModel> Threads { get; set; }
         public List<PostModel> Posts { get; set; }
@@ -37,7 +40,8 @@ namespace DotForums.Models
         }
 
         public UserModel(string ip) : this()
-        {   
+        {
+            Profile.IPS.Add(new UserInformationModel.IP(ip));
         }
     }
 }

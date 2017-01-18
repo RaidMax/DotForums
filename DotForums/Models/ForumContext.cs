@@ -26,39 +26,23 @@ namespace DotForums.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             #region UserModel
-
-            /* modelBuilder.Entity<ThreadModel>()
-                 .HasMany(t => t.Posts)
-                 .WithOne(p => p.Parent)
-                 .HasForeignKey(p => p)
-                 .OnDelete(DeleteBehavior.Cascade);
-                 */
-            modelBuilder.Entity<UserModel>()
+           modelBuilder.Entity<UserModel>()
                 .HasMany(u => u.Threads)
                 .WithOne(t => t.Author)
-                .HasForeignKey(a => a.ID)
+                .HasForeignKey(t => t.AuthorID)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<ThreadModel>()
-                .HasMany(t => t.Posts)
-                .WithOne(p => p.Parent)
-                .HasForeignKey(p => p.ID)
+            modelBuilder.Entity<UserModel>()
+                .HasMany(u => u.Posts)
+                .WithOne(p => p.Author)
+                .HasForeignKey(u => u.AuthorID)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<UserGroupModel>()
-                .HasKey(u => new { u.GroupID, u.UserID });
-
-            modelBuilder.Entity<UserGroupModel>()
-                .HasOne(ug => ug.User)
-                .WithMany(p => p.Groups)
-                .HasForeignKey(ug => ug.UserID);
-            
-
-            modelBuilder.Entity<UserGroupModel>()
-                .HasOne(ug => ug.Group)
-                .WithMany(u => u.Members)
-                .HasForeignKey(ug => ug.GroupID);
-       
+            modelBuilder.Entity<UserModel>()
+                .HasMany(u => u.Groups)
+                .WithOne(g => g.User)
+                .HasForeignKey(u => u.UserID)
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Make Username and Email unique (but changable)
             modelBuilder.Entity<UserModel>()
@@ -75,15 +59,53 @@ namespace DotForums.Models
                 .ForSqliteHasDefaultValueSql("CURRENT_TIMESTAMP");
             #endregion
 
+            #region UserGroup
+            modelBuilder.Entity<UserGroupModel>()
+                .HasAlternateKey(u => new { u.GroupID, u.UserID });
+
+            modelBuilder.Entity<UserGroupModel>()
+                .HasOne(ug => ug.User)
+                .WithMany(u => u.Groups)
+                .HasForeignKey(u => u.UserID)
+                .OnDelete(DeleteBehavior.Cascade);
+            #endregion
+
+            #region UserInformation
+            modelBuilder.Entity<UserInformationModel>()
+                .HasOne(ui => ui.Avatar)
+                .WithOne()
+                .OnDelete(DeleteBehavior.Cascade);
+            #endregion
+
             #region ThreadModel
             modelBuilder.Entity<ThreadModel>()
                 .Property(t => t.Date)
                 .ValueGeneratedOnAdd()
-                .HasDefaultValueSql("CURRENT_TIMESTAMP"); ;
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
             modelBuilder.Entity<ThreadModel>()
                 .Property(t => t.Modified)
                 .ValueGeneratedOnAddOrUpdate()
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            modelBuilder.Entity<ThreadModel>()
+                .HasOne(c => c.Author)
+                .WithMany(a => a.Threads)
+                .HasForeignKey(a => a.AuthorID);
+
+            modelBuilder.Entity<ThreadModel>()
+                 .HasMany(t => t.Posts)
+                 .WithOne(p => p.Parent)
+                 .HasForeignKey(p => p.ParentID)
+                 .OnDelete(DeleteBehavior.Cascade);
+            #endregion
+
+            #region PermissionModel
+            modelBuilder.Entity<PermissionModel>()
+                .HasOne(p => p.Thread)
+                .WithMany(t => t.Permissions)
+                .HasForeignKey(p => p.ThreadID)
+                .OnDelete(DeleteBehavior.Cascade);
             #endregion
         }
     }

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -17,7 +19,13 @@ namespace DotForums.Models
             DELETE = 0x8
         }
 
+        [ForeignKey("Group")]
+        public ulong? GroupID { get; set; }
         public GroupModel Group { get; set; }
+
+        [ForeignKey("Thread")]
+        public ulong? ThreadID { get; set; }
+        public ThreadModel Thread { get; set; }
         public PermissionEnum Permission { get; set; }
 
         public const PermissionEnum ALL_PERMISSIONS = PermissionEnum.READ | PermissionEnum.CREATE | PermissionEnum.MODIFY | PermissionEnum.DELETE;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Net;
 
 namespace DotForums.Models
@@ -18,16 +19,14 @@ namespace DotForums.Models
         }
 
         public List<IP> IPS { get; set; }
-        //public UserModel Owner { get; set; }
+        [ForeignKey("Avatar")]
+        public ulong AvatarID { get; set; }
+        public ImageModel Avatar { get; set; }
 
         public UserInformationModel()
         {
             IPS = new List<IP>();
-        }
-
-        public UserInformationModel(UserModel Owner) : base()
-        {
-           // this.Owner = Owner;
+            Avatar = new ImageModel();
         }
     }
 }

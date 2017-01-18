@@ -57,15 +57,13 @@ namespace DotForums.Forum
         public async Task<UserModel> DeleteAsync(ulong ID)
         {
             var User = await _context.Users
-                .Include(u => u.Threads)
                 .SingleOrDefaultAsync(u => u.ID == ID);
 
             if (User != null)
             {
                 try
                 {
-                    _context.Threads.RemoveRange(User.Threads);
-                    //_context.Users.Remove(User);
+                    _context.Users.Remove(User);
                     await _context.SaveChangesAsync();
                 }
 

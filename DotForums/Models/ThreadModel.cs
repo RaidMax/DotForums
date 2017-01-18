@@ -23,8 +23,14 @@ namespace DotForums.Models
                 Slug = value?.Replace(' ', '-').ToLower() + '-' + DateTime.Now.Millisecond.ToString();
             }
         }
+        [ForeignKey("Author")]
+        public ulong AuthorID { get; set; }
         [Required]
         public UserModel Author { get; set; }
+        [ForeignKey("Category")]
+        public ulong CategoryID { get; set; }
+        [Required]
+        public CategoryModel Category { get; set; }
         [Required]
         public List<PermissionModel> Permissions { get; set; }
         [Required]

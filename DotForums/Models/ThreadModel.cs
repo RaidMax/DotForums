@@ -24,8 +24,6 @@ namespace DotForums.Models
             }
         }
         [Required]
-        public string Content { get; set; }
-        [Required]
         public UserModel Author { get; set; }
         [Required]
         public List<PermissionModel> Permissions { get; set; }

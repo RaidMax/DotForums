@@ -97,23 +97,22 @@ namespace DotForums
                         Name = "User",
                         Username = "Administrator",
                         Email = "admin@dotforums.org",
-                        Groups = new List<Models.GroupModel> { Administrators }
+                        Groups = new List<Models.UserGroupModel>()
                     };
 
                     var Thread = new Models.ThreadModel
                     {
                         Name = "Thread",
                         Title = "Thread Title",
-                        Content = "Thread Content",
                         Author = Administrator,
                     };
 
                     var Reply = new Models.PostModel
                     {
                         Name = "Reply",
-                        Title = "Reply Title",
                         Content = "Reply Content",
                         Author = Administrator,
+                        Parent = Thread,
                     };
 
                     Thread.Permissions.Add(new Models.PermissionModel
@@ -123,14 +122,23 @@ namespace DotForums
                         Permission = Models.PermissionModel.ALL_PERMISSIONS
                     });
 
-                    Context.Users.Add(Administrator);
-                    Context.Posts.Add(Reply);
-                    Thread.Posts.Add(Reply);
-                    Administrator.Threads.Add(Thread);
-                    General.Threads.Add(Thread);
+                   
+
                     Context.Categories.Add(General);
                     Context.Groups.Add(Administrators);
                     Context.Groups.Add(Users);
+
+                    Administrator.Groups.Add(new Models.UserGroupModel
+                    {
+                        GroupID = Administrators.ID,
+                        Group = Administrators,
+                        UserID = Administrator.ID,
+                        User = Administrator
+                    });
+
+                    Context.Users.Add(Administrator);
+                    Thread.Posts.Add(Reply);
+                    General.Threads.Add(Thread);
                     Context.SaveChanges();
 
                     #region PERFORMANCE_TESTING
@@ -142,8 +150,13 @@ namespace DotForums
                             Name = "User",
                             Username = "TestUser" + i,
                             Email = "user@dotforums.org" + i,
-                            Groups = new List<Models.GroupModel> { Users }
                         };
+                        User.Groups.Add(new Models.UserGroupModel
+                        {
+                            User = User,
+                            Group = Users
+                        });
+
                         Context.Users.Add(User);
                     }
 

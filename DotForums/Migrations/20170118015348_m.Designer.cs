@@ -8,8 +8,8 @@ using DotForums.Models;
 namespace DotForums.Migrations
 {
     [DbContext(typeof(ForumContext))]
-    [Migration("20170117010040_M2")]
-    partial class M2
+    [Migration("20170118015348_m")]
+    partial class m
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -58,18 +58,14 @@ namespace DotForums.Migrations
                     b.Property<ulong>("ID")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("Members");
+                    b.Property<int>("Count");
 
                     b.Property<string>("Name");
 
                     b.Property<string>("Title")
                         .IsRequired();
 
-                    b.Property<ulong?>("UserModelID");
-
                     b.HasKey("ID");
-
-                    b.HasIndex("UserModelID");
 
                     b.ToTable("Groups");
                 });
@@ -100,24 +96,36 @@ namespace DotForums.Migrations
                     b.ToTable("PermissionModel");
                 });
 
+            modelBuilder.Entity("DotForums.Models.PostModel", b =>
+                {
+                    b.Property<ulong>("ID");
+
+                    b.Property<ulong?>("AuthorID");
+
+                    b.Property<string>("Content");
+
+                    b.Property<DateTime>("Date");
+
+                    b.Property<DateTime>("Modified");
+
+                    b.Property<string>("Name");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("AuthorID");
+
+                    b.ToTable("Posts");
+                });
+
             modelBuilder.Entity("DotForums.Models.ThreadModel", b =>
                 {
-                    b.Property<ulong>("ID")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<ulong>("AuthorID");
+                    b.Property<ulong>("ID");
 
                     b.Property<ulong?>("CategoryModelID");
-
-                    b.Property<string>("Content")
-                        .IsRequired();
 
                     b.Property<DateTime>("Date")
                         .ValueGeneratedOnAdd()
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                    b.Property<string>("Discriminator")
-                        .IsRequired();
 
                     b.Property<DateTime>("Modified")
                         .ValueGeneratedOnAddOrUpdate()
@@ -132,13 +140,33 @@ namespace DotForums.Migrations
 
                     b.HasKey("ID");
 
-                    b.HasIndex("AuthorID");
-
                     b.HasIndex("CategoryModelID");
 
                     b.ToTable("Threads");
+                });
 
-                    b.HasDiscriminator<string>("Discriminator").HasValue("ThreadModel");
+            modelBuilder.Entity("DotForums.Models.UserGroupModel", b =>
+                {
+                    b.Property<ulong>("ID")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<int>("GroupID");
+
+                    b.Property<ulong?>("GroupID1");
+
+                    b.Property<string>("Name");
+
+                    b.Property<int>("UserID");
+
+                    b.Property<ulong?>("UserID1");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("GroupID1");
+
+                    b.HasIndex("UserID1");
+
+                    b.ToTable("UserGroupModel");
                 });
 
             modelBuilder.Entity("DotForums.Models.UserModel", b =>
@@ -169,23 +197,6 @@ namespace DotForums.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("DotForums.Models.PostModel", b =>
-                {
-                    b.HasBaseType("DotForums.Models.ThreadModel");
-
-                    b.Property<ulong?>("ParentID");
-
-                    b.Property<ulong?>("UserModelID");
-
-                    b.HasIndex("ParentID");
-
-                    b.HasIndex("UserModelID");
-
-                    b.ToTable("PostModel");
-
-                    b.HasDiscriminator().HasValue("PostModel");
-                });
-
             modelBuilder.Entity("DotForums.Models.CategoryModel", b =>
                 {
                     b.HasOne("DotForums.Models.CategoryModel")
@@ -197,13 +208,6 @@ namespace DotForums.Migrations
                 {
                     b.HasOne("DotForums.Models.UserModel")
                         .WithMany("Events")
-                        .HasForeignKey("UserModelID");
-                });
-
-            modelBuilder.Entity("DotForums.Models.GroupModel", b =>
-                {
-                    b.HasOne("DotForums.Models.UserModel")
-                        .WithMany("Groups")
                         .HasForeignKey("UserModelID");
                 });
 
@@ -222,28 +226,39 @@ namespace DotForums.Migrations
                         .HasForeignKey("ThreadModelID");
                 });
 
-            modelBuilder.Entity("DotForums.Models.ThreadModel", b =>
+            modelBuilder.Entity("DotForums.Models.PostModel", b =>
                 {
                     b.HasOne("DotForums.Models.UserModel", "Author")
-                        .WithMany("Threads")
-                        .HasForeignKey("AuthorID")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .WithMany("Posts")
+                        .HasForeignKey("AuthorID");
 
+                    b.HasOne("DotForums.Models.ThreadModel", "Parent")
+                        .WithMany("Posts")
+                        .HasForeignKey("ID")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("DotForums.Models.ThreadModel", b =>
+                {
                     b.HasOne("DotForums.Models.CategoryModel")
                         .WithMany("Threads")
                         .HasForeignKey("CategoryModelID");
+
+                    b.HasOne("DotForums.Models.UserModel", "Author")
+                        .WithMany("Threads")
+                        .HasForeignKey("ID")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("DotForums.Models.PostModel", b =>
+            modelBuilder.Entity("DotForums.Models.UserGroupModel", b =>
                 {
-                    b.HasOne("DotForums.Models.ThreadModel", "Parent")
-                        .WithMany("Posts")
-                        .HasForeignKey("ParentID")
-                        .OnDelete(DeleteBehavior.Cascade);
+                    b.HasOne("DotForums.Models.GroupModel", "Group")
+                        .WithMany("Members")
+                        .HasForeignKey("GroupID1");
 
-                    b.HasOne("DotForums.Models.UserModel")
-                        .WithMany("Posts")
-                        .HasForeignKey("UserModelID");
+                    b.HasOne("DotForums.Models.UserModel", "User")
+                        .WithMany("Groups")
+                        .HasForeignKey("UserID1");
                 });
         }
     }

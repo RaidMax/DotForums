@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace DotForums.Models
@@ -7,10 +8,12 @@ namespace DotForums.Models
     {
         [Required]
         public string Title { get; set; }
-        public int Members { get; set; }
+        public int Count { get; set; }
+        public List<UserGroupModel> Members { get; set; }
 
         public GroupModel()
         {
+            Members = new List<UserGroupModel>();
             Name = "GroupModel";
         }
     }

@@ -27,27 +27,38 @@ namespace DotForums.Models
         {
             #region UserModel
 
+            /* modelBuilder.Entity<ThreadModel>()
+                 .HasMany(t => t.Posts)
+                 .WithOne(p => p.Parent)
+                 .HasForeignKey(p => p)
+                 .OnDelete(DeleteBehavior.Cascade);
+                 */
+            modelBuilder.Entity<UserModel>()
+                .HasMany(u => u.Threads)
+                .WithOne(t => t.Author)
+                .HasForeignKey(a => a.ID)
+                .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<ThreadModel>()
                 .HasMany(t => t.Posts)
                 .WithOne(p => p.Parent)
+                .HasForeignKey(p => p.ID)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<UserModel>()
-                .HasMany(u => u.Threads)
-                .WithOne(u => u.Author)
-                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<UserGroupModel>()
+                .HasKey(u => new { u.GroupID, u.UserID });
 
-            modelBuilder.Entity<PostModel>()
-                .HasOne(u => u.Parent)
-                .WithMany(p => p.Posts)
-                .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<UserGroupModel>()
+                .HasOne(ug => ug.User)
+                .WithMany(p => p.Groups)
+                .HasForeignKey(ug => ug.UserID);
             
-            /*
-            omEF CdelBuilder.Entity<UserModel>()
-                .HasOne(u => u.Profile)
-                .WithOne()
-                .HasForeignKey<UserInformationModel>(b => b.ID)
-                .OnDelete(DeleteBehavior.Cascade);*/
+
+            modelBuilder.Entity<UserGroupModel>()
+                .HasOne(ug => ug.Group)
+                .WithMany(u => u.Members)
+                .HasForeignKey(ug => ug.GroupID);
+       
 
             // Make Username and Email unique (but changable)
             modelBuilder.Entity<UserModel>()

@@ -22,10 +22,17 @@ namespace DotForums.Forum
         {
             var User = new UserModel(Body["ip"])
             {
-                Username = Body["username"],
-                Email = Body["email"],
-                Groups = new List<GroupModel> { await Manager.GetContext().forumContext.Groups.FindAsync((ulong)2) }
+                Username = Body["Username"],
+                Email = Body["Email"],
+                //Groups = new List<UserGroupModel>()
+
             };
+            User.Threads.ToArray();
+            User.Groups.Add(new UserGroupModel
+            {
+                Group = await _context.Groups.FindAsync((ulong)2),
+                User = User
+            });
 
             try
             {

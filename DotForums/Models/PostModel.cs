@@ -20,5 +20,10 @@ namespace DotForums.Models
         [Required]
         public UserModel Author { get; set; }
         public string Content { get; set; }
+
+        public PostModel()
+        {
+            Name = "PostModel";
+        }
     }
 }

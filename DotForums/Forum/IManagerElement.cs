@@ -14,15 +14,7 @@ namespace DotForums.Forum
         /// <param name="parameters">Required parameters to create the object</param>
         /// <returns></returns>
         Task<T> CreateAsync(IDictionary<string, string> Body);
-        /// <summary>
-        /// Get ForumModel Object Asynchronously
-        /// </summary>
-        /// <typeparam name="T">Type of Forum Model</typeparam>
-        /// <param name="ID">Database ID of the ForumModel object</param>
-        /// <returns></returns>
-        Task<T> GetAsync(ulong ID);
-        Task<List<T>> GetAsync();
-        Task<List<T>> GetAsync(Expression<Func<T, bool>> lamda, int index, int size);
+        Task<ICollection<T>> GetAsync(ulong ID = 0, Expression<Func<T, bool>> lamda = null, string include = null, int index = 0, int size = 0);
         /// <summary>
         /// Delete ForumModel Object Asynchronously
         /// </summary>

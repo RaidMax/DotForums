@@ -25,7 +25,6 @@ namespace DotForums.Models
 
         public UserInformationModel()
         {
-            IPS = new List<IP>();
             Avatar = new ImageModel();
         }
     }

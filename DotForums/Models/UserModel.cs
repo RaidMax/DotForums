@@ -12,14 +12,14 @@ namespace DotForums.Models
         [Required(ErrorMessage = "Email is required")]
         public string Email { get; set; }
         [Required(ErrorMessage = "Group is required")]
-        public List<UserGroupModel> Groups { get; set; }
+        public ICollection<UserGroupModel> Groups { get; set; }
         public DateTime Seen { get; set; }
         public DateTime Date { get; set; } 
         public ulong ProfileID { get; set; }
         [ForeignKey("ProfileID")]
         public UserInformationModel Profile { get; set; }
-        public List<ThreadModel> Threads { get; set; }
-        public List<PostModel> Posts { get; set; }
+        public ICollection<ThreadModel> Threads { get; set; }
+        public ICollection<PostModel> Posts { get; set; }
         /*
         public ICollection<ThreadModel> subscribedThreads { get; set; }
         public ICollection<ThreadModel> privateThreads { get; set; }
@@ -32,11 +32,6 @@ namespace DotForums.Models
         public UserModel()
         {
             Name = "UserModel";
-            Threads = new List<ThreadModel>();
-            Posts = new List<PostModel>();
-            Events = new Queue<EventModel>();
-            Profile = new UserInformationModel();
-            Groups = new List<UserGroupModel>();
         }
 
         public UserModel(string ip) : this()

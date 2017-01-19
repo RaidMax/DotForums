@@ -9,5 +9,10 @@ namespace DotForums.Models
     {
         public string URL { get; set; }
         public byte[] Data { get; set; }
+
+        public ImageModel()
+        {
+            Name = "ImageModel";
+        }
     }
 }

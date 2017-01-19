@@ -49,5 +49,10 @@ namespace DotForums.Models
         {
             return (Permissions & PermissionEnum.DELETE) == PermissionEnum.DELETE;
         }
+
+        public PermissionModel()
+        {
+            Name = "PermissionModel";
+        }
     }
 }

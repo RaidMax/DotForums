@@ -32,18 +32,16 @@ namespace DotForums.Models
         [Required]
         public CategoryModel Category { get; set; }
         [Required]
-        public List<PermissionModel> Permissions { get; set; }
+        public ICollection<PermissionModel> Permissions { get; set; }
         [Required]
-        public List<PostModel> Posts { get; set; }
+        public ICollection<PostModel> Posts { get; set; }
         public string Slug { get; set; }
         public DateTime Date { get; set; }
         public DateTime Modified { get; set; }
 
         public ThreadModel()
         {
-            Name = "Thread";
-            Permissions = new List<PermissionModel>();
-            Posts = new List<PostModel>();
+            Name = "ThreadModel";
         }
     }
 }

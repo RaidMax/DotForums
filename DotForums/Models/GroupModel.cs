@@ -9,7 +9,7 @@ namespace DotForums.Models
         [Required]
         public string Title { get; set; }
         public int Count { get; set; }
-        public List<UserGroupModel> Members { get; set; }
+        public ICollection<UserGroupModel> Members { get; set; }
 
         public GroupModel()
         {

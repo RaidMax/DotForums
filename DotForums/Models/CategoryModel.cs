@@ -11,18 +11,16 @@ namespace DotForums.Models
         [Required]
         public string Description { get; set; }
         [Required]
-        public List<PermissionModel> Permissions { get; set; }
+        public ICollection<PermissionModel> Permissions { get; set; }
         [Required]
-        public List<CategoryModel> Children { get; set; }
+        public ICollection<CategoryModel> Children { get; set; }
         [Required]
-        public List<ThreadModel> Threads { get; set; }
+        public ICollection<ThreadModel> Threads { get; set; }
         public ulong Count { get; set; }
 
         public CategoryModel()
         {
-            Permissions = new List<PermissionModel>();
-            Threads = new List<ThreadModel>();
-            Children = new List<CategoryModel>();
+            Name = "CategoryModel";
         }
     }
 }

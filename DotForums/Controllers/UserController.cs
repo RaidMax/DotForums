@@ -23,17 +23,26 @@ namespace DotForums.Controllers
         {    
             if (index < 1 || size < 1)
                 return Ok(await _context.Users.GetAsync());
-            return Ok(await _context.Users.GetAsync(null, index, size));
+            return Ok(await _context.Users.GetAsync(0, null, null, index, size));
         }
 
         // GET api/User/{ID}
         [HttpGet("{ID}")]
-        public async Task<IActionResult> Get(ulong ID)
+        public async Task<IActionResult> Get(ulong ID, [FromQuery] string include)
         {
-            var User = await _context.Users.GetAsync(ID);
-            if (User != null)
-                return Ok(User);
-            return NotFound(new ForumError() { Code = ForumError.ErrorCodes.USER_NOTFOUND });
+            try
+            {
+                var User = await _context.Users.GetAsync(ID, null, include);
+                if (User != null)
+                    return Ok(User);
+
+                return NotFound(new ForumError() { Code = ForumError.ErrorCodes.USER_NOTFOUND });
+            }
+
+            catch (InvalidOperationException)
+            {
+                return StatusCode(400);
+            }
         }
 
         // POST api/User

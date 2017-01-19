@@ -78,21 +78,60 @@ namespace DotForums.Forum
             return null;
         }
 
-        public async Task<UserModel> GetAsync(ulong ID)
+        /*public async Task<UserModel> GetAsync(ulong ID)
         {
             return await _context.Users
                .Include(u => u.Groups)
+               .Include(u => u.Threads)
                .SingleOrDefaultAsync(u => u.ID == ID);
         }
 
         public async Task<List<UserModel>> GetAsync()
         {
             return await Manager.GetContext().forumContext.Users.ToListAsync();
-        }
+        }*/
 
-        public async Task<List<UserModel>> GetAsync(Expression<Func<UserModel, bool>> lamda, int index = 0, int size = 25)
+        public async Task<ICollection<UserModel>> GetAsync(ulong ID = 0, Expression<Func<UserModel, bool>> lamda = null, string include = null, int index = 0, int size = 0)
         {
-            return await Display.PaginatedList<UserModel>.CreateAsync(Manager.GetContext().forumContext.Users, index, size);
+            if (index > 0 && size > 0 && ID == 0)
+            {
+                return await Display.PaginatedList<UserModel>.CreateAsync(_context.Users, index, size);
+            }
+
+            else if (ID > 0)
+            {
+                if (lamda != null && include != null)
+                {
+                    return await _context.Users
+                        .Include(include)
+                        .Where(u => u.ID == ID)
+                        .Where(lamda)
+                        .ToListAsync();
+                }
+
+                else if (lamda != null)
+                {
+                    return await _context.Users
+                        .Where(u => u.ID == ID)
+                        .Where(lamda)
+                        .ToListAsync();
+                }
+
+                else if (include != null)
+                {
+                    return await _context.Users
+                        .Include(include)
+                        .Where(u => u.ID == ID)
+                        .ToListAsync();
+                }
+
+                return await _context.Users
+                        .Where(u => u.ID == ID)
+                        .ToListAsync();
+            }
+
+            else
+                return await _context.Users.ToListAsync();
         }
 
         public async Task<UserModel> UpdateAsync(ulong ID, IDictionary<string, object> Body)

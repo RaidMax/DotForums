@@ -32,9 +32,24 @@ namespace DotForums.Models
         [Required]
         public CategoryModel Category { get; set; }
         [Required]
-        public ICollection<PermissionModel> Permissions { get; set; }
+        private ICollection<PermissionModel> _permissions;
+        public virtual ICollection<PermissionModel> Permissions
+        {
+            get
+            {
+                return _permissions ?? (_permissions = new List<PermissionModel>());
+            }
+        }
         [Required]
-        public ICollection<PostModel> Posts { get; set; }
+        private ICollection<PostModel> _posts;
+        public virtual ICollection<PostModel> Posts
+        {
+            get
+            {
+                return _posts ?? (_posts = new List<PostModel>());
+            }
+        }
+        [Required]
         public string Slug { get; set; }
         public DateTime Date { get; set; }
         public DateTime Modified { get; set; }

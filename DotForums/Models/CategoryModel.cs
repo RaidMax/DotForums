@@ -11,11 +11,35 @@ namespace DotForums.Models
         [Required]
         public string Description { get; set; }
         [Required]
-        public ICollection<PermissionModel> Permissions { get; set; }
+        public string Title { get; set; }
         [Required]
-        public ICollection<CategoryModel> Children { get; set; }
+        private ICollection<PermissionModel> _permissions;
+        public virtual ICollection<PermissionModel> Permissions
+        {
+            get
+            {
+                return _permissions ?? (_permissions = new List<PermissionModel>());
+            }
+        }
         [Required]
-        public ICollection<ThreadModel> Threads { get; set; }
+        private ICollection<CategoryModel> _children;
+        public virtual ICollection<CategoryModel> Children
+        {
+            get
+            {
+                return _children ?? (_children = new List<CategoryModel>());
+            }
+        }
+        [Required]
+        private ICollection<ThreadModel> _threads;
+        public virtual ICollection<ThreadModel> Threads
+        {
+            get
+            {
+                return _threads ?? (_threads = new List<ThreadModel>());
+            }
+        }
+
         public ulong Count { get; set; }
 
         public CategoryModel()

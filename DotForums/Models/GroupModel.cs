@@ -9,11 +9,17 @@ namespace DotForums.Models
         [Required]
         public string Title { get; set; }
         public int Count { get; set; }
-        public ICollection<UserGroupModel> Members { get; set; }
+        private ICollection<UserGroupModel> _members;
+        public virtual ICollection<UserGroupModel> Members
+        {
+            get
+            {
+                return _members ?? (_members = new List<UserGroupModel>());
+            }
+        }
 
         public GroupModel()
         {
-            Members = new List<UserGroupModel>();
             Name = "GroupModel";
         }
     }

@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Net;
 
 namespace DotForums.Models
 {
-    public class UserInformationModel : ForumObjectModel
+    public class UserProfileModel : ForumObjectModel
     {
         public class IP : ForumObjectModel
         {
@@ -18,14 +19,24 @@ namespace DotForums.Models
             }
         }
 
-        public List<IP> IPS { get; set; }
+        private ICollection<IP> _ips;
+        public virtual ICollection<IP> IPS
+        {
+            get
+            {
+                return _ips ?? (_ips = new List<IP>());
+            }
+        }
+
         [ForeignKey("Avatar")]
         public ulong AvatarID { get; set; }
+        [Required]
         public ImageModel Avatar { get; set; }
 
-        public UserInformationModel()
+        public UserProfileModel()
         {
             Avatar = new ImageModel();
+            Name = "UserProfile";
         }
     }
 }

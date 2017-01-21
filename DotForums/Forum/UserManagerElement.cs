@@ -20,14 +20,18 @@ namespace DotForums.Forum
 
         public async Task<UserModel> CreateAsync(IDictionary<string, string> Body)
         {
-            var User = new UserModel(Body["ip"])
+            var User = new UserModel()
             {
                 Username = Body["Username"],
                 Email = Body["Email"],
-                //Groups = new List<UserGroupModel>()
-
             };
-            User.Threads.ToArray();
+
+            // fixme throw exception
+            if (await _context.Users.Where(u => u.Username == User.Username || u.Email == User.Email).FirstOrDefaultAsync() != null)
+                return null;
+
+            await User.SetPasswordAsync(Body["Password"]);
+
             User.Groups.Add(new UserGroupModel
             {
                 Group = await _context.Groups.FindAsync((ulong)2),
@@ -36,7 +40,7 @@ namespace DotForums.Forum
 
             try
             {
-                await _context.Users.AddAsync(User);
+                _context.Users.Add(User);
                 await _context.SaveChangesAsync();
                 return await _context.Users.FirstOrDefaultAsync(u => u.Username == User.Username);
             }
@@ -48,8 +52,6 @@ namespace DotForums.Forum
 
             catch (DbUpdateException e)
             {
-                _context.Users.Remove(User);
-                await _context.SaveChangesAsync();
                 return null;
             }
         }
@@ -78,20 +80,7 @@ namespace DotForums.Forum
             return null;
         }
 
-        /*public async Task<UserModel> GetAsync(ulong ID)
-        {
-            return await _context.Users
-               .Include(u => u.Groups)
-               .Include(u => u.Threads)
-               .SingleOrDefaultAsync(u => u.ID == ID);
-        }
-
-        public async Task<List<UserModel>> GetAsync()
-        {
-            return await Manager.GetContext().forumContext.Users.ToListAsync();
-        }*/
-
-        public async Task<ICollection<UserModel>> GetAsync(ulong ID = 0, Expression<Func<UserModel, bool>> lamda = null, string include = null, int index = 0, int size = 0)
+        public async Task<ICollection<UserModel>> GetAsync(ulong ID = 0, Expression<Func<UserModel, bool>> lamda = null, string include = "Profile", int index = 0, int size = 0)
         {
             if (index > 0 && size > 0 && ID == 0)
             {
@@ -129,6 +118,12 @@ namespace DotForums.Forum
                         .Where(u => u.ID == ID)
                         .ToListAsync();
             }
+
+            else if (lamda != null)
+                return await _context.Users
+                    .Include(include)
+                    .Where(lamda)
+                    .ToListAsync();
 
             else
                 return await _context.Users.ToListAsync();

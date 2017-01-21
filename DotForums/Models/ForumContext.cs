@@ -17,6 +17,7 @@ namespace DotForums.Models
         public DbSet<CategoryModel> Categories { get; set; }
         public DbSet<ThreadModel> Threads { get; set; }
         public DbSet<PostModel> Posts { get; set; }
+        public DbSet<UserProfileModel> Profiles { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -47,7 +48,7 @@ namespace DotForums.Models
             // Make Username and Email unique (but changable)
             modelBuilder.Entity<UserModel>()
                 .HasIndex(u => new { u.Username, u.Email });
-                
+                   
             // Set creation date to current time
             modelBuilder.Entity<UserModel>()
                 .Property(c => c.Date)
@@ -71,7 +72,7 @@ namespace DotForums.Models
             #endregion
 
             #region UserInformation
-            modelBuilder.Entity<UserInformationModel>()
+            modelBuilder.Entity<UserProfileModel>()
                 .HasOne(ui => ui.Avatar)
                 .WithOne()
                 .OnDelete(DeleteBehavior.Cascade);

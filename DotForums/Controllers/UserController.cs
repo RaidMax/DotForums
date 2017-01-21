@@ -28,18 +28,27 @@ namespace DotForums.Controllers
 
         // GET api/User/{ID}
         [HttpGet("{ID}")]
-        public async Task<IActionResult> Get(ulong ID, [FromQuery] string include)
+        public async Task<IActionResult> Get(string ID, [FromQuery] string include)
         {
             try
             {
-                var User = await _context.Users.GetAsync(ID, null, include);
-                if (User != null)
-                    return Ok(User);
+                ulong userID = 0;
+                ICollection<UserModel> Users = null;
+                UInt64.TryParse(ID.ToString(), out userID);
+
+                if (userID > 0)
+                    Users = await _context.Users.GetAsync(userID, null, include);
+
+                else
+                    Users = await _context.Users.GetAsync(0, user => user.Username == ID.ToString(), include);
+
+                if (Users.Count == 1)
+                    return Ok(Users.FirstOrDefault());
 
                 return NotFound(new ForumError() { Code = ForumError.ErrorCodes.USER_NOTFOUND });
             }
 
-            catch (InvalidOperationException)
+            catch (InvalidOperationException e)
             {
                 return StatusCode(400);
             }

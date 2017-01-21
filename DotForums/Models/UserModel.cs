@@ -2,41 +2,84 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Threading.Tasks;
 
 namespace DotForums.Models
 {
     public class UserModel : ForumObjectModel
     {
         [Required(ErrorMessage = "Username is required")]
+        [MaxLength(20, ErrorMessage ="Username must be less than 21 characters")]
         public string Username { get; set; }
         [Required(ErrorMessage = "Email is required")]
         public string Email { get; set; }
-        [Required(ErrorMessage = "Group is required")]
-        public ICollection<UserGroupModel> Groups { get; set; }
+        [Required]
+        private ICollection<UserGroupModel> _groups;
+        public virtual ICollection<UserGroupModel> Groups
+        {
+            get
+            {
+                return _groups ?? (_groups = new List<UserGroupModel>());
+            }
+        }
         public DateTime Seen { get; set; }
-        public DateTime Date { get; set; } 
+        public DateTime Date { get; set; }
+        [ForeignKey("Profile")]
         public ulong ProfileID { get; set; }
-        [ForeignKey("ProfileID")]
-        public UserInformationModel Profile { get; set; }
-        public ICollection<ThreadModel> Threads { get; set; }
-        public ICollection<PostModel> Posts { get; set; }
-        /*
-        public ICollection<ThreadModel> subscribedThreads { get; set; }
-        public ICollection<ThreadModel> privateThreads { get; set; }
-        public ICollection<WarningModel> Warnings { get; set; }*/
-        public Queue<EventModel> Events { get; set; }
-
-        private string passwordHash { get; set; }
-        private string passwordSalt { get; set; }
+        [Required]
+        public UserProfileModel Profile { get; set; }
+        private ICollection<ThreadModel> _threads;
+        public virtual ICollection<ThreadModel> Threads
+        {
+            get
+            {
+                return _threads ?? (_threads = new List<ThreadModel>());
+            }
+        }
+        private ICollection<PostModel> _posts;
+        public virtual ICollection<PostModel> Posts
+        {
+            get
+            {
+                return _posts ?? (_posts = new List<PostModel>());
+            }
+        }
+        private Queue<NotificationModel> _notifications;
+        public Queue<NotificationModel> Notifications
+        {
+            get
+            {
+                return _notifications ?? (_notifications = new Queue<NotificationModel>());
+            }
+        }
+        [Required(ErrorMessage ="Password is required")]
+        private string Password { get; set; }
       
         public UserModel()
         {
             Name = "UserModel";
+            Profile = new UserProfileModel();
         }
 
-        public UserModel(string ip) : this()
+        public void SetPassword(string password)
         {
-            Profile.IPS.Add(new UserInformationModel.IP(ip));
+            Password = Forum.Security.GeneratePassword(password, 15000);
+        }
+
+        public async Task SetPasswordAsync(string password)
+        {
+            await Task.Run(() =>
+            {
+                Password = Forum.Security.GeneratePassword(password, 15000);
+            });
+        }
+
+        public async Task<bool> ValidatePasswordAsync(string input)
+        {
+            return await Task.Run(() =>
+            {
+                return Forum.Security.ValidatePassword(input, Password);
+            });
         }
     }
 }

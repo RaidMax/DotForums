@@ -81,24 +81,23 @@ namespace DotForums
 
                     var General = new Models.CategoryModel
                     {
-                        Name = "General",
+                        Title = "General",
                         Description = "Everything goes here!",
                     };
 
                     General.Permissions.Add(new Models.PermissionModel
                     {
-                        Name = "Permissions",
                         Group = Administrators,
                         Permission = Models.PermissionModel.ALL_PERMISSIONS
                     });
 
                     var Administrator = new Models.UserModel
                     {
-                        Name = "User",
                         Username = "Administrator",
                         Email = "admin@dotforums.org",
-                        Groups = new List<Models.UserGroupModel>()
                     };
+
+                    Administrator.SetPassword("password");
 
                     var Thread = new Models.ThreadModel
                     {
@@ -147,10 +146,10 @@ namespace DotForums
                     {
                         User = new Models.UserModel
                         {
-                            Name = "User",
                             Username = "TestUser" + i,
                             Email = "user@dotforums.org" + i,
                         };
+
                         User.Groups.Add(new Models.UserGroupModel
                         {
                             User = User,

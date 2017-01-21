@@ -32,6 +32,14 @@ namespace DotForums.Models
         public ulong AvatarID { get; set; }
         [Required]
         public ImageModel Avatar { get; set; }
+        private ICollection<AttributeModel> _attributes;
+        public virtual ICollection<AttributeModel> Attributes
+        {
+            get
+            {
+                return _attributes ?? (_attributes = new List<AttributeModel>());
+            }
+        }
 
         public UserProfileModel()
         {

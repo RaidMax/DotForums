@@ -121,8 +121,6 @@ namespace DotForums
                         Permission = Models.PermissionModel.ALL_PERMISSIONS
                     });
 
-                   
-
                     Context.Categories.Add(General);
                     Context.Groups.Add(Administrators);
                     Context.Groups.Add(Users);
@@ -135,6 +133,27 @@ namespace DotForums
                         User = Administrator
                     });
 
+                    var Skype = new Models.AttributeModel()
+                    {
+                        Title = new Models.AttributeTitleModel
+                        {
+                            Title = "Skype"
+                        },
+                        Value = "AdminSkypeAccount"
+                    };
+
+                    var Steam = new Models.AttributeModel()
+                    {
+                        Title = new Models.AttributeTitleModel()
+                        {
+                            Title = "Steam",
+                            Link = "http://steamcommunity.com/id/{%LINK%}"
+                        },
+                        Value = "administrator"
+                    };
+                   
+                    Administrator.Profile.Attributes.Add(Skype);
+                    Administrator.Profile.Attributes.Add(Steam);
                     Context.Users.Add(Administrator);
                     Thread.Posts.Add(Reply);
                     General.Threads.Add(Thread);

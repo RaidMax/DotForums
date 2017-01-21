@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Microsoft.EntityFrameworkCore.Metadata;
 
 
@@ -18,6 +17,7 @@ namespace DotForums.Models
         public DbSet<ThreadModel> Threads { get; set; }
         public DbSet<PostModel> Posts { get; set; }
         public DbSet<UserProfileModel> Profiles { get; set; }
+        public DbSet<AttributeModel> Attributes { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -27,7 +27,13 @@ namespace DotForums.Models
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             #region UserModel
-           modelBuilder.Entity<UserModel>()
+            // Make Username and Email unique (but changable)
+            // checkme: this doesn't seem to be applying?
+            modelBuilder.Entity<UserModel>()
+                .HasIndex(u => new { u.Username, u.Email })
+                .IsUnique();
+
+            modelBuilder.Entity<UserModel>()
                 .HasMany(u => u.Threads)
                 .WithOne(t => t.Author)
                 .HasForeignKey(t => t.AuthorID)
@@ -44,10 +50,6 @@ namespace DotForums.Models
                 .WithOne(g => g.User)
                 .HasForeignKey(u => u.UserID)
                 .OnDelete(DeleteBehavior.Cascade);
-
-            // Make Username and Email unique (but changable)
-            modelBuilder.Entity<UserModel>()
-                .HasIndex(u => new { u.Username, u.Email });
                    
             // Set creation date to current time
             modelBuilder.Entity<UserModel>()

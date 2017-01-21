@@ -26,7 +26,7 @@ namespace DotForums.Forum
                 Email = Body["Email"],
             };
 
-            // fixme throw exception
+            // fixme: throw exception?
             if (await _context.Users.Where(u => u.Username == User.Username || u.Email == User.Email).FirstOrDefaultAsync() != null)
                 return null;
 
@@ -40,6 +40,7 @@ namespace DotForums.Forum
 
             try
             {
+                // checkme: why does AddAsync cause PK = 0?
                 _context.Users.Add(User);
                 await _context.SaveChangesAsync();
                 return await _context.Users.FirstOrDefaultAsync(u => u.Username == User.Username);
@@ -71,6 +72,7 @@ namespace DotForums.Forum
 
                 catch (DbUpdateConcurrencyException ex)
                 {          
+                    // logme
                     return null;
                 }
 
@@ -89,32 +91,18 @@ namespace DotForums.Forum
 
             else if (ID > 0)
             {
-                if (lamda != null && include != null)
+                if (lamda != null)
                 {
                     return await _context.Users
-                        .Include(include)
+                        .Include(include ?? "Profile")
                         .Where(u => u.ID == ID)
                         .Where(lamda)
                         .ToListAsync();
                 }
 
-                else if (lamda != null)
-                {
-                    return await _context.Users
-                        .Where(u => u.ID == ID)
-                        .Where(lamda)
-                        .ToListAsync();
-                }
-
-                else if (include != null)
-                {
-                    return await _context.Users
-                        .Include(include)
-                        .Where(u => u.ID == ID)
-                        .ToListAsync();
-                }
 
                 return await _context.Users
+                        .Include(include ?? "Profile")
                         .Where(u => u.ID == ID)
                         .ToListAsync();
             }
@@ -135,25 +123,48 @@ namespace DotForums.Forum
             if (Existing != null)
             {
                 var Model = _context.Users.Attach(Existing);
-                foreach (string Key in Body.Keys)
-                {
-                    var Property = Model.Property(Key);
-                    if (Property != null)
-                        Property.CurrentValue = Body[Key];
-                }
 
                 try
                 {
+                    foreach (string Key in Body.Keys)
+                    {
+                        var Property = Model.Property(Key);
+                        if (Property != null)
+                            Property.CurrentValue = Body[Key];
+                    }
+
+                    // we only want the update to happen if all keys are valid. 
                     await _context.SaveChangesAsync();
                     return Existing;
                 }
+
                 catch (InvalidOperationException e)
                 {
+                    // logme
                     return null;
                 }
 
                 catch (DbUpdateException e)
                 {
+                    // logme
+                    return null;
+                }
+
+                catch (FormatException e)
+                {
+                    // logme
+                    return null;
+                }
+
+                catch (InvalidCastException e)
+                {
+                    // logme
+                    return null;
+                }
+
+                catch (NullReferenceException e)
+                {
+                    // logme
                     return null;
                 }
             }

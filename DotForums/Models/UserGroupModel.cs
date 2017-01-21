@@ -18,5 +18,10 @@ namespace DotForums.Models
         public ulong GroupID { get; set; }
         [Required]
         public GroupModel Group { get; set; }
+
+        public UserGroupModel()
+        {
+            Name = "UserGroup";
+        }
     }
 }

@@ -18,6 +18,7 @@ namespace DotForums.Models
         public DbSet<PostModel> Posts { get; set; }
         public DbSet<UserProfileModel> Profiles { get; set; }
         public DbSet<AttributeModel> Attributes { get; set; }
+        public DbSet<FileModel> Files { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -109,6 +110,16 @@ namespace DotForums.Models
                 .WithMany(t => t.Permissions)
                 .HasForeignKey(p => p.ThreadID)
                 .OnDelete(DeleteBehavior.Cascade);
+            #endregion
+
+            #region FileModel
+            modelBuilder.Entity<FileModel>()
+            .Property(u => u.Created)
+            .ValueGeneratedOnAdd()
+            .ForSqliteHasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            modelBuilder.Entity<FileModel>()
+                .HasAlternateKey(f => f.FileName);
             #endregion
         }
     }

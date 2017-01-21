@@ -23,11 +23,7 @@ namespace DotForums.Models
             set
             {
                 _value = value;
-
-                if (Title.Link != null)
-                    Link = Title.Link.Replace("{%LINK%}", value);
-                else
-                    Link = null;
+                Link = (Title.Link != null) ? Title.Link.Replace("{%LINK%}", value) : null;
             }
         }
 

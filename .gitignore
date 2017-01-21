@@ -3,6 +3,7 @@
 
 # Migration files
 Migrations/
+Migrations/*
 
 # User-specific files
 *.suo

@@ -31,7 +31,7 @@ namespace DotForums.Models
         [ForeignKey("Avatar")]
         public ulong AvatarID { get; set; }
         [Required]
-        public ImageModel Avatar { get; set; }
+        public FileModel Avatar { get; set; }
         private ICollection<AttributeModel> _attributes;
         public virtual ICollection<AttributeModel> Attributes
         {
@@ -43,7 +43,12 @@ namespace DotForums.Models
 
         public UserProfileModel()
         {
-            Avatar = new ImageModel();
+            Avatar = new FileModel()
+            {
+                Title = "Default Avatar",
+                FileName = "DefaultAvatar.png",
+            };
+
             Name = "UserProfile";
         }
     }

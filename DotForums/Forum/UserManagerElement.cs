@@ -6,6 +6,8 @@ using DotForums.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Data.SqlClient;
+using Microsoft.AspNetCore.Http;
+using System.IO;
 
 namespace DotForums.Forum
 {
@@ -123,6 +125,37 @@ namespace DotForums.Forum
             if (Existing != null)
             {
                 var Model = _context.Users.Attach(Existing);
+                //FileModel Avatar = null;
+                if (Body.ContainsKey("Avatar"))
+                {
+                    var File = (IFormFile)Body["Avatar"];
+                    if (FileModel.GetFileType(File.FileName) == FileModel.FileType.IMAGE)
+                    {
+                        byte[] AvatarArray = null;
+                        using (var Stream = new MemoryStream())
+                        {
+                            await File.CopyToAsync(Stream);
+                            // checkme: restrict max file size
+                            AvatarArray = Stream.ToArray();
+                        }
+
+                        
+                        var Avatar = new FileModel()
+                        {
+                            Title = String.Format("{0}'s Avatar", Existing.Username),
+                            Data = AvatarArray,
+                            FileName = File.FileName,
+                            Type = FileModel.FileType.IMAGE,
+                            ContentType = File.ContentType
+                        };
+
+                        _context.Files.Add(Avatar);
+                        await _context.SaveChangesAsync();
+                        Existing.ProfileID = Avatar.ID;
+                    }
+
+                    Body.Remove("Avatar");
+                }
 
                 try
                 {

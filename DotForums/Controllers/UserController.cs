@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using DotForums.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace DotForums.Controllers
 {
@@ -63,13 +64,33 @@ namespace DotForums.Controllers
             if (User != null)
                 return Created(User.ID.ToString(), User);
 
-            return StatusCode(409);
+            return StatusCode(StatusCodes.Status409Conflict);
         }
 
-        // PUT api/User/{ID}
-        [HttpPut("{ID}")]
-        public async Task<IActionResult> Put(ulong ID, [FromBody]Dictionary<string, object> Body)
+        [HttpPost("{ID}")]
+        public async Task<IActionResult> Put(ulong ID,ICollection<IFormFile> files = null)
         {
+            var Body = new Dictionary<string, object>();
+            if (files != null && files.Count == 1)
+            {
+                Body.Add("Avatar", files.First());
+
+                var User = await _context.Users.UpdateAsync(ID, Body);
+                if (User != null)
+                    return Ok(User);
+                return NotFound(new ForumError() { Code = ForumError.ErrorCodes.USER_NOTFOUND });
+            }
+
+            return StatusCode(StatusCodes.Status400BadRequest);
+        }
+
+        // PUT api/User/{ID} (updating a user profile)
+        [HttpPut("{ID}")]
+        public async Task<IActionResult> Put(ulong ID, [FromBody]Dictionary<string, object> Body, ICollection<IFormFile> files = null)
+        {
+            if (files != null && files.Count == 1)
+                Body.Add("Avatar", files.First());
+
             var User = await _context.Users.UpdateAsync(ID, Body);
             if (User != null)
                 return Ok(User);

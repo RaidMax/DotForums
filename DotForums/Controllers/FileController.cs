@@ -5,6 +5,7 @@ using DotForums.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using System.IO;
+using Microsoft.AspNetCore.Http;
 
 namespace DotForums.Controllers
 {
@@ -18,7 +19,7 @@ namespace DotForums.Controllers
             var File = await new ForumContext().Files.Where(f => f.FileName == FileName).FirstOrDefaultAsync();
             if (File == null)
                 return NotFound();
-            return Ok(new FileStreamResult(new MemoryStream(File.Data), File.ContentType));
+            return (File.Data == null) ? (IActionResult)StatusCode(StatusCodes.Status204NoContent) : new FileStreamResult(new MemoryStream(File.Data), File.ContentType);
         }
     }
 }

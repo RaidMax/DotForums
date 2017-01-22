@@ -121,6 +121,10 @@ namespace DotForums.Models
             modelBuilder.Entity<FileModel>()
                 .HasAlternateKey(f => f.FileName);
             #endregion
+
+            modelBuilder.Entity<UserProfileModel>()
+                .HasIndex(c => c.AvatarID)
+                .IsUnique(false);
         }
     }
 }

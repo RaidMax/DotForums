@@ -151,13 +151,22 @@ namespace DotForums
                         },
                         Value = "administrator"
                     };
-                   
+
+                    var Avatar = new Models.FileModel()
+                    {
+                        Title = "Default Avatar",
+                        FileName = "DefaultAvatar.png",
+                        Type = Models.FileModel.FileType.IMAGE,
+                        ContentType = "image/jpeg"
+                    };
+
+                    Context.Files.Add(Avatar);
                     Administrator.Profile.Attributes.Add(Skype);
                     Administrator.Profile.Attributes.Add(Steam);
+                    Administrator.Profile.Avatar = Avatar;
                     Context.Users.Add(Administrator);
                     Thread.Posts.Add(Reply);
                     General.Threads.Add(Thread);
-                    Context.SaveChanges();
 
                     #region PERFORMANCE_TESTING
                     Models.UserModel User = null;
@@ -175,6 +184,9 @@ namespace DotForums
                             Group = Users
                         });
 
+                        User.SetPassword("password");
+
+                        User.Profile.Avatar = Avatar;    
                         Context.Users.Add(User);
                     }
 

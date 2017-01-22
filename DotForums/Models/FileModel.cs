@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -19,8 +20,8 @@ namespace DotForums.Models
         }
 
         public string Title { get; set; }
+        public DateTime Created { get; set; }
         private string _filename;
-        [Required]
         public virtual string FileName
         {
             get
@@ -30,9 +31,15 @@ namespace DotForums.Models
 
             set
             {
-                string[] split = value.Split('\\');
-                int index = split.Count() - 1;
-                _filename = DateTime.Now.ToFileTimeUtc() + "_" + split[index];
+                if (Created == DateTime.MinValue)
+                {
+                    string[] split = value.Split('\\');
+                    int index = split.Count() - 1;
+                    _filename = DateTime.Now.ToFileTimeUtc() + "_" + split[index];
+                }
+
+                else
+                    _filename = value;
             }
         }
         public virtual string Path
@@ -46,7 +53,6 @@ namespace DotForums.Models
         [Required]
         public string ContentType { get; set; }
         public byte[] Data { get; set; }
-        public DateTime Created { get; set; }
         public string Link { get; set; }
 
         public virtual int Size

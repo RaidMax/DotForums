@@ -150,6 +150,7 @@ namespace DotForums.Forum
                         };
 
                         _context.Files.Add(Avatar);
+                        Existing.Profile.Avatar = Avatar;
                         await _context.SaveChangesAsync();
                         Existing.ProfileID = Avatar.ID;
                     }

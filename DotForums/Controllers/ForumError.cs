@@ -57,6 +57,11 @@ namespace DotForums.Controllers
         public string Message { get; set; }
     }
 
+    public class UserException : Exception
+    {
+        public UserException(string msg) : base (msg) { }
+    }
+
     static class Helpers
     {
 

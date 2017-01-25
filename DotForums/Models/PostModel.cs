@@ -20,6 +20,14 @@ namespace DotForums.Models
         [Required]
         public UserModel Author { get; set; }
         public string Content { get; set; }
+        private ICollection<FileModel> _attachments;
+        public virtual ICollection<FileModel> Attachments
+        {
+            get
+            {
+                return _attachments ?? (_attachments = new List<FileModel>());
+            }
+        }
 
         public PostModel()
         {

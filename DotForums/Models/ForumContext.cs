@@ -104,6 +104,18 @@ namespace DotForums.Models
                  .OnDelete(DeleteBehavior.Cascade);
             #endregion
 
+            #region PostModel
+            modelBuilder.Entity<PostModel>()
+                .Property(t => t.Date)
+                .ValueGeneratedOnAdd()
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            modelBuilder.Entity<PostModel>()
+                .Property(t => t.Modified)
+                .ValueGeneratedOnAddOrUpdate()
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            #endregion
+
             #region PermissionModel
             modelBuilder.Entity<PermissionModel>()
                 .HasOne(p => p.Thread)

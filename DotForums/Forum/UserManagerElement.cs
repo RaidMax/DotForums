@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using DotForums.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using System.Data.SqlClient;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 
@@ -73,7 +72,7 @@ namespace DotForums.Forum
                 }
 
                 catch (DbUpdateConcurrencyException ex)
-                {          
+                {
                     // logme
                     return null;
                 }
@@ -139,7 +138,7 @@ namespace DotForums.Forum
                             AvatarArray = Stream.ToArray();
                         }
 
-                        
+
                         var Avatar = new FileModel()
                         {
                             Title = String.Format("{0}'s Avatar", Existing.Username),
@@ -203,7 +202,7 @@ namespace DotForums.Forum
                 }
             }
 
-            return null;                 
+            return null;
         }
     }
 }

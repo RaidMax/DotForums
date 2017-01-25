@@ -11,6 +11,7 @@ namespace DotForums.Forum
         public Models.ForumContext forumContext { get; private set; }
 
         public UserManagerElement Users { get; private set; }
+        public ThreadManagerElement Threads { get; private set; }
 
         public static Manager GetContext()
         {
@@ -23,6 +24,7 @@ namespace DotForums.Forum
         {
             forumContext = new Models.ForumContext();
             Users = new UserManagerElement();
+            Threads = new ThreadManagerElement();
         }
     }
 }

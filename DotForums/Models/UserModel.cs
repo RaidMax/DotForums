@@ -12,6 +12,7 @@ namespace DotForums.Models
         [MaxLength(20, ErrorMessage ="Username must be less than 21 characters")]
         public string Username { get; set; }
         [Required(ErrorMessage = "Email is required")]
+        [MaxLength(64, ErrorMessage = "Email must be less than 65 characters")]
         public string Email { get; set; }
         [Required]
         private ICollection<UserGroupModel> _groups;
@@ -22,8 +23,8 @@ namespace DotForums.Models
                 return _groups ?? (_groups = new List<UserGroupModel>());
             }
         }
-        public DateTime Seen { get; set; }
-        public DateTime Date { get; set; }
+        public DateTime Seen { get; private set; }
+        public DateTime Date { get; private set; }
         [ForeignKey("Profile")]
         public ulong ProfileID { get; set; }
         [Required]
@@ -53,6 +54,7 @@ namespace DotForums.Models
             }
         }
         [Required(ErrorMessage ="Password is required")]
+        [MaxLength(100, ErrorMessage ="Password must be less than 101 characters")]
         private string Password { get; set; }
       
         public UserModel()

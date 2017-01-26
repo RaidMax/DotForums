@@ -10,6 +10,7 @@ namespace DotForums.Models
         [NotMapped]
         private string _title;
         [Required]
+        [MaxLength(40)]
         public string Title
         {
             get

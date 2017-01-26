@@ -19,6 +19,7 @@ namespace DotForums.Models
         public ulong AuthorID { get; set; }
         [Required]
         public UserModel Author { get; set; }
+        [MaxLength(2000)]
         public string Content { get; set; }
         private ICollection<FileModel> _attachments;
         public virtual ICollection<FileModel> Attachments

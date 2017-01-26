@@ -109,14 +109,12 @@ namespace DotForums.Controllers
 
         #region GET_USER_INFORMATION
         [HttpGet("{ID}/Threads")]
-        public async Task<IActionResult> GetThreadsByUser(ulong ID)
+        public async Task<IActionResult> GetThreadsByUser(ulong ID, [FromQuery]int index, [FromQuery]int size)
         {
-            /* var Threads = await _context.Threads
-                 .Where(t => t.Author.ID == ID && t.Parent == null)
-                 .ToListAsync();
+           if (index > 0 && size > 1)
+                return Ok(await _context.Threads.GetAsync(0, (t => t.AuthorID == ID), null, index, size));
 
-            return Ok(Threads); */
-            throw new NotImplementedException();
+            return StatusCode(StatusCodes.Status400BadRequest);
         }
 
         [HttpGet("{ID}/Posts")]

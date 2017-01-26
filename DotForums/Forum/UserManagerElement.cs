@@ -101,7 +101,6 @@ namespace DotForums.Forum
                         .ToListAsync();
                 }
 
-
                 return await _context.Users
                         .Include(include ?? "Profile")
                         .Where(u => u.ID == ID)
@@ -151,7 +150,7 @@ namespace DotForums.Forum
                         _context.Files.Add(Avatar);
                         Existing.Profile.Avatar = Avatar;
                         await _context.SaveChangesAsync();
-                        Existing.ProfileID = Avatar.ID;
+                        
                     }
 
                     Body.Remove("Avatar");

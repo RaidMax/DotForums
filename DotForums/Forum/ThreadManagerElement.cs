@@ -71,7 +71,7 @@ namespace DotForums.Forum
                 return new List<ThreadModel>
                 {
                     await _context.Threads
-                        .Include(include)
+                        .Include(include ?? "Author")
                         .Include(t => t.Category)
                         .Include(t => t.Author)
                         .SingleOrDefaultAsync(t => t.ID == ID)
@@ -79,7 +79,7 @@ namespace DotForums.Forum
             }
 
             return await _context.Threads
-                    .Include(include)
+                    .Include(include ?? "Author")
                     .Include(t => t.Category)
                     .Include(t => t.Author)
                     .Where(lamda).ToListAsync();
@@ -91,16 +91,50 @@ namespace DotForums.Forum
 
             if (Thread != null)
             {
-                var Model = _context.Threads.Attach(Thread);
-                foreach (string Key in Body.Keys)
+                try
                 {
-                    var Property = Model.Property(Key);
-                    if (Property != null)
-                        Property.CurrentValue = Body[Key];
+                    var Model = _context.Threads.Attach(Thread);
+                    foreach (string Key in Body.Keys)
+                    {
+                        var Property = Model.Property(Key);
+                        if (Property != null)
+                            Property.CurrentValue = Body[Key];
+                   
+                    }
+                    // we only want the update to happen if all keys are valid. 
+                    Model.Property(t => t.Modified).CurrentValue = DateTime.Now;
+                    await _context.SaveChangesAsync();
                 }
 
-                // we only want the update to happen if all keys are valid. 
-                await _context.SaveChangesAsync();
+                catch (InvalidOperationException e)
+                {
+                    // logme
+                    return null;
+                }
+
+                catch (DbUpdateException e)
+                {
+                    // logme
+                    return null;
+                }
+
+                catch (FormatException e)
+                {
+                    // logme
+                    return null;
+                }
+
+                catch (InvalidCastException e)
+                {
+                    // logme
+                    return null;
+                }
+
+                catch (NullReferenceException e)
+                {
+                    // logme
+                    return null;
+                }
             }
 
             return Thread;

@@ -89,8 +89,8 @@ namespace DotForums.Models
 
             modelBuilder.Entity<ThreadModel>()
                 .Property(t => t.Modified)
-                .ValueGeneratedOnAddOrUpdate()
-                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .ValueGeneratedOnAdd();
 
             modelBuilder.Entity<ThreadModel>()
                 .HasOne(c => c.Author)
@@ -112,7 +112,7 @@ namespace DotForums.Models
 
             modelBuilder.Entity<PostModel>()
                 .Property(t => t.Modified)
-                .ValueGeneratedOnAddOrUpdate()
+                .ValueGeneratedOnAdd()
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
             #endregion
 

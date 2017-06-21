@@ -8,34 +8,33 @@ using System.Linq.Expressions;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 
-namespace DotForums.Forum
+using DotForums.Forum;
+using DotForums.Forum.Display;
+using DotForums.Domain;
+
+namespace DotForums.Services
 {
-    public class UserManagerElement : IManagerElement<UserModel>
+    public class UserService : IService<UserDTO>
     {
-        private readonly ForumContext _context;
+        private readonly ForumContext _context = new ForumContext();
 
-        public UserManagerElement()
-        {
-            _context = new ForumContext();
-        }
-
-        public async Task<UserModel> CreateAsync(IDictionary<string, string> Body)
+        public async Task<UserDTO> CreateAsync(UserDTO Value)
         {
             var User = new UserModel()
             {
-                Username = Body["Username"],
-                Email = Body["Email"],
+                Username = Value.Username,
+                Email = Value.Email
             };
 
             // fixme: throw exception?
             if (await _context.Users.Where(u => u.Username == User.Username || u.Email == User.Email).FirstOrDefaultAsync() != null)
                 return null;
 
-            await User.SetPasswordAsync(Body["Password"]);
+            await User.SetPasswordAsync(Value.Password);
 
             User.Groups.Add(new UserGroupModel
             {
-                Group = await _context.Groups.FindAsync((ulong)2),
+                GroupID = 2,
                 User = User
             });
 
@@ -44,7 +43,8 @@ namespace DotForums.Forum
                 // checkme: why does AddAsync cause PK = 0?
                 _context.Users.Add(User);
                 await _context.SaveChangesAsync();
-                return await _context.Users.FirstOrDefaultAsync(u => u.Username == User.Username);
+                Value.ID = User.ID;
+                return Value;
             }
 
             catch (InvalidOperationException e)
@@ -58,7 +58,7 @@ namespace DotForums.Forum
             }
         }
 
-        public async Task<UserModel> DeleteAsync(ulong ID)
+        public async Task<UserDTO> DeleteAsync(ulong ID)
         {
             var User = await _context.Users
                 .SingleOrDefaultAsync(u => u.ID == ID);
@@ -77,17 +77,60 @@ namespace DotForums.Forum
                     return null;
                 }
 
-                return User;
+                return new UserDTO()
+                {
+                    ID = User.ID,
+                    ProfileID = User.ProfileID,
+                    Email = User.Email
+                };
             }
 
             return null;
         }
 
-        public async Task<ICollection<UserModel>> GetAsync(ulong ID = 0, Expression<Func<UserModel, bool>> lamda = null, string include = "Profile", int index = 0, int size = 0)
+        public async Task<ICollection<UserDTO>> GetAsync(ulong ID, QueryOptions Options)
         {
-            if (index > 0 && size > 0 && ID == 0)
+            var DTOList = new List<UserDTO>();
+            if (ID > 0)
             {
-                return await Display.PaginatedList<UserModel>.CreateAsync(_context.Users, index, size);
+                var User = await _context.Users.SingleOrDefaultAsync(u => u.ID == ID);
+                DTOList.Add(new UserDTO()
+                {
+                    ID = User.ID,
+                    Username = User.Username,
+                    Email = User.Email,
+                    Seen = User.Seen,
+                    Date = User.Date,
+                    ProfileID = User.ProfileID,
+                    PostCount = User.Posts.Count(),
+                    ThreadCount = User.Threads.Count()
+                });
+            }
+
+            else
+            {
+                // todo: apply queryoptions
+                var Users = await _context.Users.ToListAsync();
+                foreach (var User in Users)
+                {
+                    DTOList.Add(new UserDTO()
+                    {
+                        ID = User.ID,
+                        Username = User.Username,
+                        Email = User.Email,
+                        Seen = User.Seen,
+                        Date = User.Date,
+                        ProfileID = User.ProfileID,
+                        PostCount = User.Posts.Count(),
+                        ThreadCount = User.Threads.Count()
+                    });
+                }
+            }
+
+            return DTOList;
+          /*  if (index > 0 && size > 0 && ID == 0)
+            {
+                return await PaginatedList<UserModel>.CreateAsync(_context.Users, index, size);
             }
 
             else if (ID > 0)
@@ -114,12 +157,24 @@ namespace DotForums.Forum
                     .ToListAsync();
 
             else
-                return await _context.Users.ToListAsync();
+                return await _context.Users.ToListAsync();*/
         }
 
-        public async Task<UserModel> UpdateAsync(ulong ID, IDictionary<string, object> Body)
+        public async Task<UserDTO> UpdateAsync(ulong ID, UserDTO Value)
         {
-            var Existing = await _context.Users.FindAsync(ID);
+            var User = await _context.Users.FindAsync(ID);
+            
+            if (User != null)
+            {
+                var TrackedUser = _context.Users.Attach(User);
+                User.Email = Value.Email ?? User.Email;
+                User.Username = Value.Username ?? User.Username;
+                await _context.SaveChangesAsync();
+            }
+
+            return null;
+
+            /*
             if (Existing != null)
             {
                 var Model = _context.Users.Attach(Existing);
@@ -201,7 +256,7 @@ namespace DotForums.Forum
                 }
             }
 
-            return null;
+            return null;*/
         }
     }
 }

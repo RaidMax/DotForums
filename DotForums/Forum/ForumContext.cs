@@ -6,19 +6,20 @@ using System.Collections.Concurrent;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
+using DotForums.Models;
 
-namespace DotForums.Models
+namespace DotForums.Forum
 {
     public class ForumContext : DbContext
     {
-        public DbSet<GroupModel> Groups { get; set; }
-        public DbSet<UserModel> Users { get; set; }
-        public DbSet<CategoryModel> Categories { get; set; }
-        public DbSet<ThreadModel> Threads { get; set; }
-        public DbSet<PostModel> Posts { get; set; }
-        public DbSet<UserProfileModel> Profiles { get; set; }
-        public DbSet<AttributeModel> Attributes { get; set; }
-        public DbSet<FileModel> Files { get; set; }
+        public DbSet<GroupModel> Groups { get; private set; }
+        public DbSet<UserModel> Users { get; private set; }
+        public DbSet<CategoryModel> Categories { get; private set; }
+        public DbSet<ThreadModel> Threads { get; private set; }
+        public DbSet<PostModel> Posts { get; private set; }
+        public DbSet<UserProfileModel> Profiles { get; private set; }
+        public DbSet<AttributeModel> Attributes { get; private set; }
+        public DbSet<FileModel> Files { get; private set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

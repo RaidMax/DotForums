@@ -10,14 +10,8 @@ using Microsoft.AspNetCore.Http;
 namespace DotForums.Controllers
 {
     [Route("api/[controller]")]
-    public class ThreadController : Controller
+    public class ThreadController : BaseController<>
     {
-        private static Forum.Manager _context;
-        public ThreadController()
-        {
-            _context = Forum.Manager.GetContext();
-        }
-
         // GET api/Thread/ID|Slug
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(string ID, [FromQuery] string include)

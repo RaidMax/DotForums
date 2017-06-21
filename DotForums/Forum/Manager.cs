@@ -3,28 +3,31 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+using DotForums.Services;
+using DotForums.Models;
+using DotForums.Domain;
+
 namespace DotForums.Forum
 {
-    public class Manager
+   public class Manager
     {
-        private static Manager _context;
-        public Models.ForumContext forumContext { get; private set; }
+        private static Manager _instance;
+        public ForumContext ForumContext { get; private set; }
 
-        public UserManagerElement Users { get; private set; }
-        public ThreadManagerElement Threads { get; private set; }
+        public IService<CategoryModel> Categories { get; private set; }
+        public IService<UserDTO> Users { get; private set; }
+        public IService<ThreadDTO> Threads { get; private set; }
 
-        public static Manager GetContext()
+        public static Manager GetInstance()
         {
-            if (_context == null)
-                _context = new Manager();
-            return _context;
+            return _instance ?? (_instance = new Manager());
         }
 
         private Manager()
         {
-            forumContext = new Models.ForumContext();
-            Users = new UserManagerElement();
-            Threads = new ThreadManagerElement();
+            ForumContext = new ForumContext();
+            Users = new UserService();
+            Threads = new ThreadService();
         }
     }
 }

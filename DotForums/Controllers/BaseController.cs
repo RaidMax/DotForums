@@ -3,55 +3,30 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using DotForums.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
+
+using DotForums.Forum;
+using System.Threading.Tasks;
 
 namespace DotForums.Controllers
 {
     [Route("api/[controller]")]
-    public class BasController : Controller
+    public abstract class BaseController<T> : Controller
     {
+        protected static readonly Manager _managerinstance = Manager.GetInstance();
         [HttpGet]
-        public IActionResult Get()
-        {
-            using (ForumContext Context = new ForumContext())
-            {
-                return null;
-            }
-        }
+        public abstract Task<IActionResult> Get(QueryOptions Options);
 
         [HttpGet("{ID}")]
-        public IActionResult Get(ulong ID)
-        {
-            using (ForumContext Context = new ForumContext())
-            {
-                return null;
-            }
-        }
+        public abstract Task<IActionResult> Get(ulong ID);
 
         [HttpPost]
-        public void Post([FromBody]string value)
-        {
-            using (ForumContext Context = new ForumContext())
-            {
-              
-            }
-        }
+        public abstract Task<IActionResult> Post([FromBody]T Value);
 
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
-            using (ForumContext Context = new ForumContext())
-            {
+        [HttpPut("{ID}")]
+        public abstract Task<IActionResult> Put(ulong ID, [FromBody]T Value);
 
-            }
-        }
-
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-            using (ForumContext Context = new ForumContext())
-            {
-
-            }
-        }
+        [HttpDelete("{ID}")]
+        public abstract Task<IActionResult> Delete(ulong ID);
     }
 }

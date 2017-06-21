@@ -5,88 +5,65 @@ using Microsoft.AspNetCore.Mvc;
 using DotForums.Models;
 using Microsoft.EntityFrameworkCore;
 
+using DotForums.Forum;
 
 namespace DotForums.Controllers
 {
     [Route("api/[controller]")]
-    public class CategoryController : Controller
+    public class CategoryController : BaseController<CategoryModel>
     {
-        [HttpGet]
-        public IActionResult Get()
-        {
-            using (ForumContext Context = new ForumContext())
-            {
-                return Ok(Context.Categories
-                    .Include(c => c.Permissions)
-                        .ThenInclude( p => p.Group)
-                    .ToList());
-            }
-        }
+  
 
-        [HttpGet("{ID}")]
-        public IActionResult Get(ulong ID)
-        {
-            using (ForumContext Context = new ForumContext())
-            {
-                var Category = Context.Categories.Find(ID);
-                if (Category != null)
-                    return Ok(Category);
-                return NotFound(new ForumError
-                {
-                    Code = ForumError.ErrorCodes.CATEGORY_NOTFOUND
-                });
-            }
-        }
-
+        /*
         [HttpGet("{ID}/Threads")]
         public IActionResult GetThreadsByCategory(ulong ID)
         {
-            using (ForumContext Context = new ForumContext())
-            {
-                var Threads = Context.Categories
+            var Context = Manager.GetInstance().ForumContext;
+            var Threads = Context.Categories
                     .Include(c => c.Threads)
                     .Where(c => c.ID == ID);
                 return Ok(Threads.ToList());
-            }
         }
 
         [HttpGet("{ID}/Threads/Posts")]
         public IActionResult GetThreadsAndPostsByCategory(ulong ID)
         {
-            using (ForumContext Context = new ForumContext())
-            {
+                var Context = Manager.GetInstance().ForumContext;
                 var Threads = Context.Categories
                     .Include(c => c.Threads)
                     .Where(c => c.ID == ID);
                 return Ok(Threads.ToList());
-            }
+        }*/
+        public override IActionResult Get(QueryOptions q)
+        {
+            throw new NotImplementedException();
         }
 
-        [HttpPost]
-        public void Post([FromBody]string value)
+        public override IActionResult Get(ulong ID)
         {
-            using (ForumContext Context = new ForumContext())
+            var Context = Manager.GetInstance().ForumContext;
+            var Category = Context.Categories.Find(ID);
+            if (Category != null)
+                return Ok(Category);
+            return NotFound(new ForumError
             {
-
-            }
+                Code = ForumError.ErrorCodes.CATEGORY_NOTFOUND
+            });
         }
 
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
+        public override IActionResult Post(CategoryModel Value)
         {
-            using (ForumContext Context = new ForumContext())
-            {
-
-            }
+            throw new NotImplementedException();
         }
 
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        public override IActionResult Put(ulong ID, CategoryModel Value)
         {
-            using (ForumContext Context = new ForumContext())
-            {
+            return Ok(Manager.GetInstance().Categories.CreateAsync(Value));
+        }
 
-            }
+        public override IActionResult Delete(ulong ID)
+        {
+            return Ok(Manager.GetInstance().Categories.DeleteAsync(ID));
         }
     }
 }

@@ -9,6 +9,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 
+using DotForums.Forum;
+
 namespace DotForums
 {
     public class Startup
@@ -65,9 +67,8 @@ namespace DotForums
                 AutomaticChallenge = true
             });
 
-            using (var Context = new Models.ForumContext())
-            {
-                if (Context.Find<Models.UserModel>((ulong)1) == null)
+            var Context = Manager.GetInstance().ForumContext;
+            if (Context.Find<Models.UserModel>((ulong)1) == null)
                 {
                     var Administrators = new Models.GroupModel
                     {
@@ -192,7 +193,6 @@ namespace DotForums
 
                     Context.SaveChanges();
                     #endregion
-                }
             }
 
             app.UseMvc(routes =>
